@@ -18,7 +18,12 @@ MAINAPP_SRCS = $(MAINAPP_CLASS) six-degrees.cc
 MAINAPP_OBJS = $(MAINAPP_SRCS:.cc=.o)
 MAINAPP = six-degrees
 
-EXECUTABLES = $(IMDBTEST) $(MAINAPP) 
+EXECUTABLES = $(IMDBTEST) $(MAINAPP)
+
+TEST_SRC = unittests.cc
+TESTOBJS = $(IMDB_CLASS:.cc=.o) $(TEST_SRC:.cc=.o)
+TESTBIN = $(TEST_SRC:.cc=.out)
+BOOST_BIN = /usr/lib/x86_64-linux-gnu/libboost_unit_test_framework.a
 
 default : $(EXECUTABLES)
 
@@ -36,3 +41,12 @@ clean :
 
 immaculate: clean
 	rm -fr *~
+
+boosttest: $(TESTBIN)
+
+$(TESTBIN): $(TESTOBJS)
+	$(CXX) $(CPPFLAGS) $(LDFLAGS) -o $(TESTBIN) $(TESTOBJS) $(BOOST_BIN) 
+
+%.o:%.cc
+	$(CXX) $(CPPFLAGS) -c -o $@ $<
+

@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <cstring>
 using namespace std;
 
 /**
@@ -59,17 +60,19 @@ struct film {
 
 inline const char *determinePathToData(const char *userSelectedPath = NULL)
 {
-  if (userSelectedPath != NULL) return userSelectedPath;
+  // if (userSelectedPath != NULL) return userSelectedPath;
+
+  // const char *ostype = getenv("OSTYPE");
+  // if (strcasecmp(ostype, "linux") == 0)
+  //   return "/home/danqkong/Developer/cpp/MyAss-CS107/Assn2-2008-KevinBacon/assn-2-six-degrees-data/little-endian/";
+  // if (strcasecmp(ostype, "solaris") == 0)
+  //   return "/usr/class/cs107/assignments/assn-2-six-degrees-data/big-endian/";
   
-  const char *ostype = getenv("OSTYPE");
-  if (strcasecmp(ostype, "linux") == 0)
-    return "/usr/class/cs107/assignments/assn-2-six-degrees-data/little-endian/";
-  if (strcasecmp(ostype, "solaris") == 0)
-    return "/usr/class/cs107/assignments/assn-2-six-degrees-data/big-endian/";
-  
-  cerr << "Unsupported OS... bailing" << endl;
-  exit(1);
-  return NULL;
+  // cerr << "Unsupported OS... bailing" << endl;
+  // exit(1);
+  // return NULL;
+
+  return "/home/danqkong/Developer/cpp/MyAss-CS107/Assn2-2008-KevinBacon/assn-2-six-degrees-data/little-endian";
 }
 
 #endif
