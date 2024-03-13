@@ -22,14 +22,16 @@ BOOST_AUTO_TEST_CASE(test_basic)
 
     vector<film> credits;
     string player = "Tom Hanks";
-    BOOST_TEST((db.getCredits(player, credits) && credits.size() != 0), "Tom Hanks should be in the database");
+    film movie = {"Splash", 1984};
+    BOOST_TEST((db.getCredits(player, credits) && credits.size() != 0), "Tom Hanks should be in the database.");
+    auto WasMovieInFilmography = [&]() {return (std::find(credits.begin(), credits.end(), movie) != credits.end());};
+    BOOST_TEST(WasMovieInFilmography(), player << " should have movie " << movie.title << " as part of their filmogrpahy.");
 
     vector<string> cast;
-    film movie = {"Splash", 1983};
     bool exists = db.getCast(movie, cast);
-    auto found = [&]() {return (std::find(cast.begin(), cast.end(), player) != cast.end());};
+    auto IsActorInCast = [&]() {return (std::find(cast.begin(), cast.end(), player) != cast.end());};
     BOOST_TEST(( exists && (cast.size() != 0)), "The movie " << movie.title << " should be in the database");
-    BOOST_TEST(found(), player << " should be in the movie " << movie.title);
+    BOOST_TEST(IsActorInCast(), player << " should be in the movie " << movie.title);
 
     string player2 = "Daryl Hannah";
     BOOST_TEST((db.getCredits(player2, credits) && credits.size() != 0), player2<<" should also be in the database");
