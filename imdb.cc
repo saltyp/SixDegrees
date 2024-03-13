@@ -70,7 +70,29 @@ bool imdb::getCredits(const string& player, vector<film>& films) const {
 }
 
 
-bool imdb::getCast(const film& movie, vector<string>& players) const { return false; }
+bool imdb::getCast(const film& movie, vector<string>& players) const { 
+  // the movieFile is akin to actorFile : int number of movies, int array of offsets for records, then the records, 
+  // each of which contains (i) c-string of movie name, (ii) single byte rep of (movie_year - 1900), (iii) extra null padding if previous byte-amount is odd, 
+  // (iv) short rep of num_actors, (v) possible 2 additonaly bytes of zero padding, then array of 4-byte int offsets into actorFile for each actor in the movie
+  bool was_found = false;
+  int* p_movieFile_start = (int*)movieFile;
+  int num_movies = *p_movieFile_start; // first record of the file
+  int* p_movie_offsets_start = p_movieFile_start + 1; // start of the actor offsets
+  
+  // binary search for the actor name:
+  auto cmp = [p_movieFile_start](const int offset, const film& movie_to_find) {
+    char* a_movie_name = (char*)p_movieFile_start + offset;
+    string a_movie_string = a_movie_name;
+    int a_movie_year = *(char*)(a_movie_name + a_movie_string.length() + 1) + 1900;
+    return (a_movie_string < movie_to_find.title) && (a_movie_year < movie_to_find.year);
+  };
+  int* p_found_movie_offset = std::lower_bound(p_movie_offsets_start, (p_movie_offsets_start+num_movies), movie, cmp);
+  // get record of the actor if found:
+  if (p_found_movie_offset != (p_movie_offsets_start+num_movies)) {
+    was_found = true;
+  }
+  return was_found; 
+}
 
 imdb::~imdb()
 {

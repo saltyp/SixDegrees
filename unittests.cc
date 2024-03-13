@@ -24,13 +24,18 @@ BOOST_AUTO_TEST_CASE(test_basic)
     string player = "Tom Hanks";
     film movie = {"Splash", 1984};
     BOOST_TEST((db.getCredits(player, credits) && credits.size() != 0), "Tom Hanks should be in the database.");
-    auto WasMovieInFilmography = [&]() {return (std::find(credits.begin(), credits.end(), movie) != credits.end());};
-    BOOST_TEST(WasMovieInFilmography(), player << " should have movie " << movie.title << " as part of their filmogrpahy.");
+    auto WasMovieInFilmography = [&](film movie) {return (std::find(credits.begin(), credits.end(), movie) != credits.end());};
+    BOOST_TEST(WasMovieInFilmography(movie), player << " should have movie " << movie.title << " as part of their filmogrpahy.");
+    film movie2 = {"Big", 1988};
+    BOOST_TEST(WasMovieInFilmography(movie2), player << " should have movie " << movie.title << " as part of their filmogrpahy.");
 
     vector<string> cast;
+    film movie_nonexistant = {"My Short Thin Turkish Sweet Sixteen", 1984};
+    BOOST_TEST(db.getCast(movie_nonexistant, cast), movie.title << " should not be in the database. ");
     bool exists = db.getCast(movie, cast);
     auto IsActorInCast = [&]() {return (std::find(cast.begin(), cast.end(), player) != cast.end());};
-    BOOST_TEST(( exists && (cast.size() != 0)), "The movie " << movie.title << " should be in the database");
+    BOOST_TEST(exists, movie.title << " should be in the database. ");
+    BOOST_TEST(( exists && (cast.size() != 0)), "The movie " << movie.title << " should return a non-zero cast.");
     BOOST_TEST(IsActorInCast(), player << " should be in the movie " << movie.title);
 
     string player2 = "Daryl Hannah";
