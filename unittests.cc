@@ -31,14 +31,32 @@ BOOST_AUTO_TEST_CASE(test_basic)
 
     vector<string> cast;
     film movie_nonexistant = {"My Short Thin Turkish Sweet Sixteen", 1984};
-    BOOST_TEST(db.getCast(movie_nonexistant, cast), movie.title << " should not be in the database. ");
+    BOOST_TEST(!db.getCast(movie_nonexistant, cast), 
+                movie_nonexistant.title << " should not be in the database. ");
     bool exists = db.getCast(movie, cast);
-    auto IsActorInCast = [&]() {return (std::find(cast.begin(), cast.end(), player) != cast.end());};
+    auto IsActorInCast = [&](const string& player) {
+                return (std::find(cast.begin(), cast.end(), player) != cast.end());};
     BOOST_TEST(exists, movie.title << " should be in the database. ");
-    BOOST_TEST(( exists && (cast.size() != 0)), "The movie " << movie.title << " should return a non-zero cast.");
-    BOOST_TEST(IsActorInCast(), player << " should be in the movie " << movie.title);
+    BOOST_TEST(( exists && (cast.size() != 0)), 
+                "The movie " << movie.title << " should return a non-zero cast.");
+    BOOST_TEST(IsActorInCast(player), player << " should be in the movie " << movie.title);
 
     string player2 = "Daryl Hannah";
-    BOOST_TEST((db.getCredits(player2, credits) && credits.size() != 0), player2<<" should also be in the database");
+    BOOST_TEST((db.getCredits(player2, credits) && credits.size() != 0), 
+                player2<<" should also be in the database");
+
+    // if movie doesn't exist then cast should be empty
+
+    BOOST_TEST((!db.getCast(movie_nonexistant, cast) && (cast.size() == 0)), 
+                movie.title << " should not be in the database & should clear cast vector. ");
+
+    // Scarface 1 != Scarface 2
+    film scarface1 = {"Scarface", 1932};
+    film scarface2 = {"Scarface", 1983};
+    string paco = "Al Pacino";
+    exists = db.getCast(scarface1, cast);
+    BOOST_TEST(!IsActorInCast(paco), paco << " should not be in the movie " << movie.title << " (1932)");
+    exists = db.getCast(scarface2, cast);
+    BOOST_TEST(IsActorInCast(paco), paco << " should be in the movie " << movie.title << " (1983)");
 
 }

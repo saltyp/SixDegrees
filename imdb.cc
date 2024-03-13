@@ -74,22 +74,40 @@ bool imdb::getCast(const film& movie, vector<string>& players) const {
   // the movieFile is akin to actorFile : int number of movies, int array of offsets for records, then the records, 
   // each of which contains (i) c-string of movie name, (ii) single byte rep of (movie_year - 1900), (iii) extra null padding if previous byte-amount is odd, 
   // (iv) short rep of num_actors, (v) possible 2 additonaly bytes of zero padding, then array of 4-byte int offsets into actorFile for each actor in the movie
-  bool was_found = false;
   int* p_movieFile_start = (int*)movieFile;
   int num_movies = *p_movieFile_start; // first record of the file
-  int* p_movie_offsets_start = p_movieFile_start + 1; // start of the actor offsets
+  int* p_movie_offsets_start = p_movieFile_start + 1; // start of the movie offsets
   
-  // binary search for the actor name:
-  auto cmp = [p_movieFile_start](const int offset, const film& movie_to_find) {
+  // binary search for the movie:
+  auto cmpMovie = [p_movieFile_start](const int offset, const film& movie_to_find) {
     char* a_movie_name = (char*)p_movieFile_start + offset;
     string a_movie_string = a_movie_name;
     int a_movie_year = *(char*)(a_movie_name + a_movie_string.length() + 1) + 1900;
-    return (a_movie_string < movie_to_find.title) && (a_movie_year < movie_to_find.year);
+    film a_movie = {a_movie_string, a_movie_year};
+    return (a_movie < movie_to_find);
   };
-  int* p_found_movie_offset = std::lower_bound(p_movie_offsets_start, (p_movie_offsets_start+num_movies), movie, cmp);
-  // get record of the actor if found:
-  if (p_found_movie_offset != (p_movie_offsets_start+num_movies)) {
-    was_found = true;
+  int* lb = std::lower_bound(p_movie_offsets_start, (p_movie_offsets_start+num_movies), movie, cmpMovie);
+  // get record of the movie if found: !TODO : this picks up regardless if movie is found or not
+  char* p_movie_record_start = (char*)movieFile + *lb; 
+  string movie_name = p_movie_record_start; // get the actor name == player
+  bool was_found = (lb != (p_movie_offsets_start+num_movies)) && (movie.title == movie_name);
+  if (was_found) {
+    // get actor name & number of movies : 
+    int movie_name_byte_length = sizeof(char)*movie_name.length(); // not including the '\0' at the end
+    int cast_size_byte_offset =  (movie_name_byte_length + 1 + 1) % 2 == 0 ? (movie_name_byte_length + 2) : (movie_name_byte_length + 3); // 1 for year, 1 for null padding
+    int cast_size = *(short*)(p_movie_record_start + cast_size_byte_offset);
+    int byte_offset_to_actorFile_offsets = cast_size_byte_offset + sizeof(short);
+    byte_offset_to_actorFile_offsets = byte_offset_to_actorFile_offsets % 4 == 0 ? byte_offset_to_actorFile_offsets : byte_offset_to_actorFile_offsets + 2;
+    int* p_actorFile_offsets = (int*)(p_movie_record_start + byte_offset_to_actorFile_offsets);
+    for (int j = 0; j < cast_size; j++) {
+      int actor_offset = *(p_actorFile_offsets + j);
+      char* p_actor_record_start = (char*)actorFile + actor_offset;
+      string actor_name = p_actor_record_start;
+      players.push_back(actor_name);
+    }
+  }
+  else {
+    players.clear();
   }
   return was_found; 
 }
