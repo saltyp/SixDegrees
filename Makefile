@@ -3,7 +3,7 @@
 ##
 
 CPPFLAGS = -g -Wall
-CXX = g++
+CXX = g++ -std=c++17
 LDFLAGS =
 
 IMDB_CLASS = imdb.cc
@@ -21,7 +21,7 @@ MAINAPP = six-degrees
 EXECUTABLES = $(IMDBTEST) $(MAINAPP)
 
 TEST_SRC = unittests.cc
-TESTOBJS = $(IMDB_CLASS:.cc=.o) $(TEST_SRC:.cc=.o)
+TESTOBJS = $(IMDB_CLASS:.cc=.o) $(TEST_SRC:.cc=.o) path.o
 TESTBIN = $(TEST_SRC:.cc=.out)
 BOOST_BIN = /usr/lib/x86_64-linux-gnu/libboost_unit_test_framework.a
 
@@ -50,3 +50,11 @@ $(TESTBIN): $(TESTOBJS)
 %.o:%.cc
 	$(CXX) $(CPPFLAGS) -c -o $@ $<
 
+# NICE FLUFF
+diff:
+	$(info The status of the repository, and the volume of per-file changes:)
+	@git status
+	@git diff --stat
+
+# include the dependencies
+-include $(DEPFILES)

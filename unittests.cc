@@ -12,6 +12,8 @@ or `g++ -std=c++17 test-boost.cc -o testboost /usr/lib/x86_64-linux-gnu/libboost
 #include "imdb-utils.h"
 #include <stdio.h>
 
+#include "path.h"
+
 using namespace std;
 
 BOOST_AUTO_TEST_CASE(test_basic) 
@@ -58,5 +60,16 @@ BOOST_AUTO_TEST_CASE(test_basic)
     BOOST_TEST(!IsActorInCast(paco), paco << " should not be in the movie " << movie.title << " (1932)");
     exists = db.getCast(scarface2, cast);
     BOOST_TEST(IsActorInCast(paco), paco << " should be in the movie " << movie.title << " (1983)");
+
+    // Unittests for path class
+    path p(player);
+    BOOST_TEST(p.getLength() == 0, "Path should be empty at beginning");
+    p.addConnection(movie, player2);
+    BOOST_TEST(p.getLastPlayer() == player2, "getLastPlayer should return " << player2);
+    BOOST_TEST(p.getLength() == 1, "Path should have 1 connection now");
+    p.undoConnection();
+    BOOST_TEST(p.getLength() == 0, "Path should be empty at beginning");
+
+
 
 }
