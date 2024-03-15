@@ -144,7 +144,6 @@ path imdb::generateShortestPath(const string& source, const string& target) cons
         return path(source);
       }
       actor_ = a_path_.getLastPlayer();
-      if (actor_ == target) return a_path_;
       // EXPAND : actor -[movies]-> other actors
       credits_.clear(); getCredits(actor_, credits_); cout << "*";
       for (film movie_:credits_) {
@@ -156,9 +155,9 @@ path imdb::generateShortestPath(const string& source, const string& target) cons
               another_path = a_path_; // copy by assignment 
               // assert(&another_path != &a_path_); // assert it's a deep copy
               another_path.addConnection(movie_, other_actor_);
-              // if (other_actor_ == target) {
-              //   return another_path; // SUCCESS !!!
-              // }
+              if (other_actor_ == target) {
+                return another_path; // SUCCESS !!!
+              }
               next_.push_back(another_path);
               explored_actors.insert(other_actor_);  // MEMOIZE
             }
