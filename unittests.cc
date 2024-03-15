@@ -101,14 +101,14 @@ BOOST_AUTO_TEST_CASE(test_basic)
 
     source = "Jerry Cain";
     tgt = "Kevin Bacon";
-    // shortest_path = db.generateShortestPath(source, tgt);
+    shortest_path = db.generateShortestPath(source, tgt);
     cout << endl << "Shortest path: " << shortest_path << endl;
-    // BOOST_TEST(shortest_path.getLength() == 3, "Shortest path btw "<< source << " and " << tgt << "should be length 3.");
+    BOOST_TEST(shortest_path.getLength() == 3, "Shortest path btw "<< source << " and " << tgt << "should be length 3.");
 
     // this one takes a long time : 
     source = "Danzel Muzingo";
     tgt = "Liseli Mutti";
-    // shortest_path = db.generateShortestPath(source, tgt);
+    shortest_path = db.generateShortestPath(source, tgt);
     cout << endl << "Shortest path: " << shortest_path << endl;
-    // BOOST_TEST(shortest_path.getLength() == 5, "Shortest path btw "<< source << " and " << tgt << "should be length 5.");
+    BOOST_TEST(shortest_path.getLength() == 5, "Shortest path btw "<< source << " and " << tgt << "should be length 5.");
 }

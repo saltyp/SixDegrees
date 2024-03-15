@@ -126,81 +126,45 @@ path imdb::generateShortestPath(const string& source, const string& target) cons
   // cout << "Shortest path Legend: '.' = film expanded, cast added; '*' = actor expanded  : " << endl;
   // iterative variables : 
   list<path> frontier_ {a_path_};
-  list<path> next_;
-  int depth = 0;
   vector<film> credits_;
   vector<string> cast_;
   string actor_;
   path another_path(source); // a different object
   
-  while(!frontier_.empty()) {
-    next_.clear();
-    // for each path in the frontier
-    while (!frontier_.empty()) {
-      // CHOOSE & REMOVE from frontier
-      a_path_ = frontier_.front(); frontier_.pop_front();
-      // TEST
-      if (a_path_.getLength() >= MAXDEPTH) {
-        return path(source);
-      }
-      actor_ = a_path_.getLastPlayer();
-      // EXPAND : actor -[movies]-> other actors
-      credits_.clear(); getCredits(actor_, credits_); cout << "*";
-      for (film movie_:credits_) {
-        if (explored_films.count(movie_)== 0) {
-          cast_.clear(); getCast(movie_,cast_); cout << ".";
-          for (string other_actor_ : cast_) {
-            if (explored_actors.count(other_actor_)==0){
-              // create another path to add to frontier
-              another_path = a_path_; // copy by assignment 
-              // assert(&another_path != &a_path_); // assert it's a deep copy
-              another_path.addConnection(movie_, other_actor_);
-              if (other_actor_ == target) {
-                return another_path; // SUCCESS !!!
-              }
-              next_.push_back(another_path);
-              explored_actors.insert(other_actor_);  // MEMOIZE
+  // for each path in the frontier
+  while (!frontier_.empty()) {
+    // CHOOSE & REMOVE from frontier
+    a_path_ = frontier_.front(); frontier_.pop_front();
+    // TEST
+    if (a_path_.getLength() >= MAXDEPTH) {
+      return path(source);
+    }
+    actor_ = a_path_.getLastPlayer();
+    // EXPAND : actor -[movies]-> other actors
+    credits_.clear(); getCredits(actor_, credits_); cout << "*";
+    for (film movie_:credits_) {
+      if (explored_films.count(movie_)== 0) {
+        cast_.clear(); getCast(movie_,cast_); cout << ".";
+        for (string other_actor_ : cast_) {
+          if (explored_actors.count(other_actor_)==0){
+            // create another path to add to frontier
+            another_path = a_path_; // copy by assignment 
+            // assert(&another_path != &a_path_); // assert it's a deep copy
+            another_path.addConnection(movie_, other_actor_);
+            if (other_actor_ == target) {
+              return another_path; // SUCCESS !!!
             }
+            frontier_.push_back(another_path);
+            explored_actors.insert(other_actor_);  // MEMOIZE
           }
-        explored_films.insert(movie_);  // MEMOIZE
         }
+      explored_films.insert(movie_);  // MEMOIZE
       }
     }
-    frontier_ = next_;
-    depth++;
   }
-  // shouldn't reach here unless edge case (eg maxdepth not reached but no connecting paths)
-  return path(source);
+// shouldn't reach here unless edge case (eg maxdepth not reached but no connecting paths)
+return path(source);
 }
-
-
-/*
-BFS(s, Adj): #bfs to visit all the vertices ; “Gods algorithm"
-	level = {s : 0}; // explored set (rep as a dict here)
-	parent = {s:None};
-	i = 1;  
-	frontier = priority_queue(); # i is how many steps took to get there, frontier what you reach in (i-1); 
-	frontier.append(s);
-	# next is what is  reached in i steps; dict level is what you’ve seen before, parent is prev state/vertex
-	while frontier: {
-		next = [];
-		for u in frontier:
-			for v in Adj[u]: {
-				if v not in level:
-					level[v] = i; 
-					parent[v] = u; 
-					next.append(v) 
-			}
-		frontier = next; 
-		i += 1; 
-	}
-*/
-
-
-
-
-
-
 
 imdb::~imdb()
 {
