@@ -4,6 +4,8 @@
 #include "imdb-utils.h"
 #include <string>
 #include <vector>
+
+#include "path.h"
 using namespace std;
 
 class imdb {
@@ -74,6 +76,23 @@ class imdb {
 
   bool getCast(const film& movie, vector<string>& players) const;
 
+  /**
+   * Function: generateShortestPath
+   * ------------------------------
+   * This function is responsible for generating the shortest path
+   * between the specified source and target actors/actresses.  The
+   * shortest path is computed using a breadth-first search, and the
+   * path is printed to the console.  If no path exists, then a message
+   * to that effect is printed.
+   * Each edge of the bidirectional graph has equal cost.
+   * @param source the name of the actor/actress from which the search should start.
+   * @param target the name of the actor/actress at which the search should end.
+   * @param db a reference to the imdb which can be used to confirm 
+   * @return if succesful, returns a path instance where the returned path.getLastPlayer() == target, 
+   * and where getLength()>0; if not succesful, then getLength() == 0.
+  */
+  path generateShortestPath(const string& source, const string& target) const; 
+  
   /**
    * Destructor: ~imdb
    * -----------------

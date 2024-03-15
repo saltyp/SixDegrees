@@ -1,6 +1,4 @@
 #include <vector>
-#include <list>
-#include <set>
 #include <string>
 #include <iostream>
 #include <iomanip>
@@ -70,7 +68,13 @@ int main(int argc, const char *argv[])
       cout << "Good one.  This is only interesting if you specify two different people." << endl;
     } else {
       // replace the following line by a call to your generateShortestPath routine... 
-      cout << endl << "No path between those two people could be found." << endl << endl;
+      path p = db.generateShortestPath(source, target);
+      if (p.getLength() > 0) {
+        cout << "Found a path!" << endl;
+        cout << p;
+      } else {
+        cout << "No path between those two people could be found." << endl;
+      }
     }
   }
   

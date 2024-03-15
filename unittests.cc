@@ -8,11 +8,11 @@ or `g++ -std=c++17 test-boost.cc -o testboost /usr/lib/x86_64-linux-gnu/libboost
 #include <boost/test/unit_test.hpp> //using static build
 // #include <boost/test/included/unit_test.hpp> //header-only too slow comppilation
 
-#include "imdb.h"
+#include "imdb.h" //unittests on imdb class and its methods
 #include "imdb-utils.h"
 #include <stdio.h>
 
-#include "path.h"
+#include "path.h" //unittests on path class
 
 using namespace std;
 
@@ -61,15 +61,54 @@ BOOST_AUTO_TEST_CASE(test_basic)
     exists = db.getCast(scarface2, cast);
     BOOST_TEST(IsActorInCast(paco), paco << " should be in the movie " << movie.title << " (1983)");
 
-    // Unittests for path class
+    // Unittests for path class: methods getLength, addConnection, getLastPlayer, undoConnection
     path p(player);
     BOOST_TEST(p.getLength() == 0, "Path should be empty at beginning");
     p.addConnection(movie, player2);
+    BOOST_TEST(p.getLength() == 1, "Path should have 1 connection now");
     BOOST_TEST(p.getLastPlayer() == player2, "getLastPlayer should return " << player2);
     BOOST_TEST(p.getLength() == 1, "Path should have 1 connection now");
     p.undoConnection();
     BOOST_TEST(p.getLength() == 0, "Path should be empty at beginning");
+    // test cloning
+    path p2(player);
+    p2 = p;
+    BOOST_TEST(&p != &p2, "Cloning should give a new object, not just another pointer to the same object");
 
 
+    // Unittest 1 for shortest path
+    string newt = "Carrie Henn";
+    string vasquez = "Jenette Goldstein";
+    path shortest_path = db.generateShortestPath(newt, vasquez);
+    cout <<  endl <<"Shortest path: " << shortest_path << endl;
+    path should_be_path = path(newt);
+    film aliens = {"Aliens", 1986};
+    should_be_path.addConnection(aliens, vasquez);
+    BOOST_TEST(shortest_path.getLength() == should_be_path.getLength(), "Shortest path should be:" << should_be_path);
+    
+    path shortest_path2 = db.generateShortestPath(player, player2);
+    cout <<  endl <<"Shortest path: " << shortest_path2 << endl;
+    path should_be_path2 = path(player);
+    film movie3 = {"Boffo! Tinseltown's Bombs and Blockbusters", 2006};
+    should_be_path2.addConnection(movie3, player2);
+    BOOST_TEST(shortest_path2.getLength() == should_be_path2.getLength(), "Shortest path should be:" << should_be_path2);
 
+    string source = "Mary Tyler Moore";
+    string tgt = "Red Buttons";
+    path shortest_path3 = db.generateShortestPath(source, tgt);
+    cout << endl << "Shortest path: " << shortest_path3 << endl;
+    BOOST_TEST(shortest_path3.getLength() == 2, "Shortest path btw "<< source << " and " << tgt << "should be length 2.");
+
+    source = "Jerry Cain";
+    tgt = "Kevin Bacon";
+    shortest_path = db.generateShortestPath(source, tgt);
+    cout << endl << "Shortest path: " << shortest_path << endl;
+    BOOST_TEST(shortest_path.getLength() == 3, "Shortest path btw "<< source << " and " << tgt << "should be length 3.");
+
+    // this one takes a long time : 
+    source = "Danzel Muzingo";
+    tgt = "Liseli Mutti";
+    shortest_path = db.generateShortestPath(source, tgt);
+    cout << endl << "Shortest path: " << shortest_path << endl;
+    BOOST_TEST(shortest_path.getLength() == 5, "Shortest path btw "<< source << " and " << tgt << "should be length 5.");
 }
