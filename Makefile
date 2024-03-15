@@ -2,8 +2,11 @@
 ## Makefile for CS107 Assignment 2: Six Degrees
 ##
 
-CPPFLAGS = -g -Wall
 CXX = g++ -std=c++17
+OPT=-O0 # no optimization of code
+# generate files that encode make rules for the .h dependencies
+DEPFLAGS=-MP -MD  # MD to generate dependency info, MP make each dependnecy file not dpend on anything to avoid errors
+CPPFLAGS = -g -Wall $(foreach D,$(INCDIRS),-I$(D)) $(OPT) $(DEPFLAGS)
 LDFLAGS =
 
 IMDB_CLASS = imdb.cc
@@ -24,6 +27,8 @@ TEST_SRC = unittests.cc
 TESTOBJS = $(IMDB_CLASS:.cc=.o) $(TEST_SRC:.cc=.o) path.o
 TESTBIN = $(TEST_SRC:.cc=.out)
 BOOST_BIN = /usr/lib/x86_64-linux-gnu/libboost_unit_test_framework.a
+
+DEPFILES = $(MAINAPP_SRCS:.cc=.d) $(TEST_SRC:.cc=.d)
 
 default : $(EXECUTABLES)
 

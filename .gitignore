@@ -2,3 +2,4 @@ Makefile_allsing
 *.out
 *.o
 .vscode/*
+*.d
