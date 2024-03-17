@@ -11,7 +11,7 @@ LDFLAGS =
 
 IMDB_CLASS = imdb.cc
 IMDB_CLASS_H = $(IMDB_CLASS:.cc=.h)
-IMDBTEST_SRCS = $(IMDB_CLASS) imdb-test.cc
+IMDBTEST_SRCS = $(IMDB_CLASS) imdb-test.cc path.cc
 IMDBTEST_OBJS = $(IMDBTEST_SRCS:.cc=.o)
 IMDBTEST = imdb-test
 
